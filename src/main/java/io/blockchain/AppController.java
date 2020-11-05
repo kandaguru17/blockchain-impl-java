@@ -29,7 +29,7 @@ public class AppController {
 
     @PostMapping("/transactions")
     public ResponseEntity<Object> createTxn(@RequestBody Object txnData) {
-        Transaction transaction = appService.addTxnToPool(txnData);
+        Transaction transaction = appService.addTxnToPool(new Transaction(txnData));
         return ResponseEntity.ok().body(transaction);
     }
 

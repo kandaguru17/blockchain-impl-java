@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class AppService {
@@ -22,7 +21,7 @@ public class AppService {
     public static final String DIFFICULTY_LVL = "00";
     public static final String GENESIS_HASH = "00000000000000000000000000000000000000000000";
     private BlockChain blockChain = new BlockChain();
-    private final List<Transaction> transactionPool = (new ArrayList<>());
+    private final List<Transaction> transactionPool = Collections.synchronizedList(new ArrayList<>());
 
 
     /**
@@ -39,12 +38,13 @@ public class AppService {
 
     /**
      * adding the transactions created into the transaction pool ,
-     * enabling the miners to pick and add it in their block to be added to the blockchain
+     * enabling the miners to pick and add it in their block
+     * to be added to the blockchain
      *
      * @param data
      * @return Transaction
      */
-    public Transaction addTxnToPool(Object data) {
+    public Transaction addTxnToPool(Transaction data) {
         Transaction newTransaction = new Transaction(data);
         transactionPool.add(newTransaction);
         return newTransaction;
@@ -57,7 +57,7 @@ public class AppService {
      * @return Block
      */
     public Block createBlock() {
-        List<Transaction> transactionsToMine = transactionPool.stream().collect(Collectors.toList());
+        List<Transaction> transactionsToMine = new ArrayList<>(transactionPool);
         transactionPool.clear();
         Block newBlock = new Block(transactionsToMine);
         if (blockChain.getChain().isEmpty())
